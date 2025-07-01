@@ -8,8 +8,8 @@ Little CLI tool written in Python made to record videos at high framerate with t
 To test the tool, just clone the project, install the dependencies and your're good to go !
 
 ```console
-git clone ...
-cd ...
+git clone https://github.com/1m0ut0n/av-alvium-cli-recorder.git
+cd av-alvium-cli-recorder
 pip install -r requirements.txt
 py cli.py --help
 ```
@@ -17,8 +17,8 @@ py cli.py --help
 But I recommmend using a virtual environment.
 
 ```console
-git clone ...
-cd ...
+git clone https://github.com/1m0ut0n/av-alvium-cli-recorder.git
+cd av-alvium-cli-recorder
 python -m venv .venv
 pip install -r requirements.txt
 source .venv/bin/activate  # Linux/macOS

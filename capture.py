@@ -92,12 +92,16 @@ def record_video(camera: AlviumCamera, output: str):
     )
 
     # Wait for the video writer thread to finish writing frames
-    video_writer_thread.join()
+    # video_writer_thread.join()
+    while video_writer_thread.is_alive():
+        echo(f"\033[A\33{frame_queue.qsize()} frames left...", fg="bright_black")
+        time.sleep(0.2)
+    echo()  # Move to the next line after the loop
     out.release()  # Close the video file
 
     # Indicate that the video has been saved successfully and show som infos
     secho(
-        "\033[A\33[2KVideo saved successfully !",
+        "\033[A\33[2K\033[A\33[2KVideo saved successfully !",
         fg="yellow",
         bold=True,
     )

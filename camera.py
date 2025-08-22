@@ -1,5 +1,5 @@
 # flake8: noqa: E501
-from vmbpy import VmbSystem
+from vmbpy import VmbSystem, PixelFormat
 from utils import cleanup_after_exception
 
 # TODO: Add a Camera interface to use different type of cameras (maybe to support the PC webcam or the Basler cameras?).
@@ -36,6 +36,13 @@ class AlviumCamera:
                     False
                 )  # So that it always use the maximum available value
                 self.__camera.ExposureAuto.set("Off")
+                # Set the pixel format to Bayer RG8 if available, otherwise Mono8
+                self.__camera.SensorBitDepth.set("Bpp8")
+                if self.color_available:
+                    self.__camera.set_pixel_format(PixelFormat.BayerRG8)
+                else:
+                    self.__camera.set_pixel_format(PixelFormat.Mono8)
+                # Switch to the sensor binning mode
                 self.__camera.BinningSelector.set("Sensor")
                 self.__camera.BinningHorizontal.set(
                     1
@@ -43,9 +50,10 @@ class AlviumCamera:
                 self.__camera.BinningVertical.set(
                     1
                 )  # Needed to change to average binning
-                self.__camera.BinningHorizontalMode.set(
-                    "Average"
-                )  # TODO: Make sure that average mode don't make us lose some exposure
+                if self.binning_available:
+                    self.__camera.BinningHorizontalMode.set(
+                        "Average"
+                    )  # TODO: Make sure that average mode don't make us lose some exposure
             except Exception as e:
                 self.__camera.__exit__(None, None, None)
                 self.__camera = None
@@ -258,6 +266,13 @@ class AlviumCamera:
 
     @property
     @cleanup_after_exception
+    def binning_available(self) -> bool:
+        """Get whether binning is available on the camera."""
+        self.__check_camera_and_vmbsyst()
+        return self.__camera.BinningHorizontalMode.is_writeable()
+
+    @property
+    @cleanup_after_exception
     def binning(self) -> bool:
         """Get the current binning mode."""
         self.__check_camera_and_vmbsyst()
@@ -277,6 +292,13 @@ class AlviumCamera:
         else:
             self.__camera.BinningHorizontal.set(1)
             self.__camera.BinningVertical.set(1)
+
+    @property
+    @cleanup_after_exception
+    def color_available(self) -> bool:
+        """Check if the camera supports color images."""
+        self.__check_camera_and_vmbsyst()
+        return PixelFormat.BayerRG8 in self.__camera.get_pixel_formats()
 
     @cleanup_after_exception
     def start_recording(self, handler):

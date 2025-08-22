@@ -7,7 +7,14 @@ def configure_camera(camera: AlviumCamera, shutter_speed, binning, height, width
     """Configure the camera settings and display the changes that are made if the setting can't be put to the given value."""
 
     # Set the binning mode
-    camera.binning = binning
+    if camera.binning_available:
+        camera.binning = binning
+    elif binning == True:
+        secho(
+            "Binning is not available on this camera. Setting binning to False.",
+            fg="bright_black",
+        )
+        binning = False
 
     # Check if the shutter speed is within the camera's shutter speed range
     # If not it is automatically set to the minimum value allowed by the camera
@@ -80,6 +87,10 @@ def configure_camera(camera: AlviumCamera, shutter_speed, binning, height, width
 def print_infos(camera: AlviumCamera):
     """Print the current camera configuration."""
     secho("- Current camera configuration -", fg="blue", bold=True)
+    secho(
+        f"Pixels : {'Colored (Bayer)' if camera.color_available else 'Gray (Mono)'}",
+        fg="blue",
+    )
     secho(f"Framerate: {camera.current_fps:.2f} fps", fg="blue")
     secho(f"Shutter speed: {camera.shutter_speed} µs", fg="blue")
     secho(

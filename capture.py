@@ -44,6 +44,9 @@ def record_video(camera: AlviumCamera, output: str):
     # Queue to save frames received from the camera until they are written to the video file
     frame_queue = queue.Queue()
 
+    # Check if the camera supports color
+    is_color = camera.color_available  # Check if the camera supports color
+
     def record_frame(frame: Frame):
         """Callback function to handle each frame received from the camera."""
         frame_queue.put_nowait(
@@ -52,7 +55,7 @@ def record_video(camera: AlviumCamera, output: str):
 
     def write_frames():
         """Thread function to write frames to the video file."""
-        nonlocal out, count
+        nonlocal out, count, is_color
         video_not_ended = True
 
         while video_not_ended:  # Loop through the queue until the recording is stopped
@@ -61,9 +64,14 @@ def record_video(camera: AlviumCamera, output: str):
                 if frame is None:  # Check for the end of the recording
                     video_not_ended = False
                 else:
-                    img = cv2.cvtColor(
-                        frame.as_numpy_ndarray(), cv2.COLOR_GRAY2RGB
-                    )  # Convert the frame to RGB format for OpenCV
+                    if is_color:
+                        img = cv2.cvtColor(
+                            frame.as_numpy_ndarray(), cv2.COLOR_BAYER_RG2RGB
+                        )  # Convert Bayer format to RGB if the camera is color
+                    else:
+                        img = cv2.cvtColor(
+                            frame.as_numpy_ndarray(), cv2.COLOR_GRAY2RGB
+                        )  # Convert Mono format to RGB if the camera is mno
                     out.write(img)  # Write the frame to the video file
                     count += 1
             except Exception as e:
@@ -113,6 +121,10 @@ def record_video(camera: AlviumCamera, output: str):
     )
     secho(f"Output file path: {output}", fg="green")
     secho(f"Video codec: {codec}", fg="green")
+    secho(
+        f"Video colors : {'RGB (Colored)' if camera.color_available else 'Mono (Shades of gray)'}",
+        fg="green",
+    )
     secho(
         f"Video resolution: {camera.image_width}x{camera.image_height} px",
         fg="green",

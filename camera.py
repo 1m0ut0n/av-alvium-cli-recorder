@@ -54,6 +54,10 @@ class AlviumCamera:
                     self.__camera.BinningHorizontalMode.set(
                         "Average"
                     )  # TODO: Make sure that average mode don't make us lose some exposure
+                # Set the device communication speed to the max available
+                self.__camera.DeviceLinkThroughputLimit.set(
+                    self.__camera.DeviceLinkThroughputLimit.get_range()[1]
+                )
             except Exception as e:
                 self.__camera.__exit__(None, None, None)
                 self.__camera = None

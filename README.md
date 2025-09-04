@@ -39,7 +39,6 @@ The tool give you two differents commands :
 **This tool has currently some limitations, some choices had to be made for the short timing that we had...** It maybe will be improved in the future. You can also feel free to fork it or make some PR !
 - It is impossible to decide of the FPS, it will always be set to the max available value depending on the current camera configuration.
 - Sometimes, the video encoding codec does not support the specific framerate that is set on the camera, and we don't check it before, so depending on the current FPS, an error can be raised.
-- The tool only support the `Mono8` pixel format.
 - Sometimes, at very high framerates, it seems that some frames misses somes chunk of data at the bottom
 
 ## Tech stack
@@ -48,7 +47,6 @@ The tool give you two differents commands :
 
 - [ ] Put the video writer logic into a specific well written class
 - [ ] Fix the imncomplete frame problem, certainly comming from the buffer logic
-- [ ] Convert the frames colors from different type of pixel formats, not just `Mono8`
 - [ ] Make the camera framerate changeable
 - [ ] Make the tool packageable so that it can be installed with `pip`
 
